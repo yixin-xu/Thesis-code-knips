@@ -27,8 +27,8 @@ if(age_range[2]==55){
 final_age <- 100
 
 
-data_directory <-  "Thesis code/Dummy data"
-code_directory <- "Thesis code/Code/CTMM-hazard"
+data_directory <-  "Dummy data"
+code_directory <- "Code/CTMM-hazard"
 
 implant_costs_raw <- implant_costs <- read_excel(paste0(data_directory, "/KNIPS_Main_input_data.xlsx"), sheet = "implant_costs")
 n_implants <- dim(implant_costs_raw[1:12,1])[1]
@@ -154,36 +154,15 @@ results_table <- summarise_results(total_costs = total_costs,
                                    intervention_names = implant_names,
                                    reference_intervention = reference_implant)
 
-write.csv(results_table, file = paste0("Thesis code/Results/CTMM-hazard/"
+write.csv(results_table, file = paste0("Results/CTMM-hazard/"
                                        , sample_gender, "_", age_range[1], "-",age_range[2],"_s",n_samples, "_p", n_patients,".csv"))
 
-# Plots a CEAC but only include interventions with a probability > 5% of being most cost-effective
-# And which have >5% probability
-lambdas <- c(1:50) * 1000
-net_benefit <- array(NA, dim = c(n_samples, n_implants, length(lambdas)))
-ceac <- matrix(NA, nrow = n_implants, ncol = length(lambdas))
-# Use loops as not computationally intensive
-for(i_lambda in 1:50) {
-  net_benefit[, , i_lambda] <- total_qalys * lambdas[i_lambda] - total_costs
-  which_max_net_benefit <- apply(net_benefit[, , i_lambda], c(1), which.max)
-  for(i_implant in 1:n_implants) {
-    ceac[i_implant, i_lambda] <- mean(which_max_net_benefit == i_implant)
-  }
-}
-
-optimal_implants <- which(rowSums(ceac > 0.05) > 0)
-knips_bcea_optimal <- bcea(e = total_qalys[, optimal_implants], 
-                           c = total_costs[, optimal_implants], 
-                           ref = which(implant_names[optimal_implants] == reference_implant), 
-                           interventions = implant_names[optimal_implants]) 
-
-# Plot the CEAC
-knips_multi_ce <- multi.ce(knips_bcea_optimal)
-
-
-jpeg(filename = paste0("Thesis code/Results/CTMM-hazard/",
+# Plots a CEAC 
+jpeg(filename = paste0("Results/CTMM-hazard/",
                        sample_gender, "_", age_range[1], "-",age_range[2],"_s",n_samples, "_p", n_patients,".jpeg"))
+knips_multi_ce <- multi.ce(knips_bcea)
 ceac.plot(knips_multi_ce, graph = "ggplot",
-          line = list(colors = c(1:length(optimal_implants))),
-          pos = c(0, 1.00))
+          line = list(colors = rainbow(12)),
+          pos = c(1,1))
+
 dev.off()
