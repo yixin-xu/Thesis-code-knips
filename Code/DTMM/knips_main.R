@@ -13,8 +13,8 @@ library(Rcpp)
 
 set.seed(14142234)
 
-data_directory <-  "Thesis code/Dummy data"
-code_directory <- "Thesis code/Code/DTMM"
+data_directory <-  "Dummy data"
+code_directory <- "Code/DTMM"
 
 # Load requisite functions
 
@@ -84,7 +84,7 @@ knips_bcea <- bcea(e = t(model_outputs$total_qalys), c = t(model_outputs$total_c
 #summary(knips_bcea, wtp = 20000)
 
 # Plot a CEAC
-setwd('Thesis code/Results/DTMM')
+setwd('Results/DTMM')
 png(file=paste0(gender,"-", age_range,"_multice.png"))
 knips_multi_ce <- multi.ce(knips_bcea)
 ceac.plot(knips_multi_ce, graph = "ggplot",
